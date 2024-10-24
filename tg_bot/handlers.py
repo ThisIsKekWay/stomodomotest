@@ -40,7 +40,7 @@ async def start(msg: types.Message, state: FSMContext):
 
 # Ловим только в нужном стейте
 
-@rt.message(F.text.in_(ZODIAC_SIGNS))
+@rt.message(F.text.in_(ZODIAC_SIGNS), StateFilter(ZodiacStates.set_zodiac))
 async def set_zodiac(
         msg: types.Message,
         state: FSMContext):
@@ -74,7 +74,7 @@ async def set_zodiac(
 
 # Свапнуть ЗЗ можно только в состоянии, когда мы уже выбрали ЗЗ.
 # Так что просто свапаем стейт, выводим клаву и ловим предыдущим хэндлером
-@rt.message(Command("change_zodiac"))
+@rt.message(Command("change_zodiac"),StateFilter(ZodiacStates.chosen_zodiac))
 async def change_zodiac(msg: types.Message, state: FSMContext):
     sent_mes = await msg.answer("Выберите новый знак зодиака", reply_markup=zodiac_keyboard)
     save_message(chat_id=msg.chat.id,
@@ -97,7 +97,7 @@ async def update_or_send_message(zod, date, cursor=1):
     return caption, reply_markup
 
 
-@rt.callback_query(F.data.in_({"0", "1"}))
+@rt.callback_query(F.data.in_({"0", "1"}), StateFilter(ZodiacStates.chosen_zodiac))
 @rt.message(Command("update"))
 async def update(event: Union[types.Message, types.CallbackQuery]):
     if isinstance(event, types.CallbackQuery):
@@ -129,7 +129,7 @@ async def update(event: Union[types.Message, types.CallbackQuery]):
 # Чистим историю в определенном состоянии, чтобы не скинуть выбор нового ЗЗ
 # придется хранить id сообщений в бд и пройтись по ним deletemessages для удаления,
 # bulk получения id сообщений нет. sad(
-@rt.message(Command("clear_history"))
+@rt.message(Command("clear_history"), StateFilter(ZodiacStates.chosen_zodiac))
 async def clear_history(msg: types.Message, state: FSMContext):
     ids = get_message_ids(chat_id=msg.chat.id)
     await bot.delete_messages(chat_id=msg.chat.id, message_ids=ids)
@@ -138,7 +138,7 @@ async def clear_history(msg: types.Message, state: FSMContext):
 
 # Ловим любой текст и прикидываемся дэбиком
 @rt.message(F.text)
-async def unknown_command(msg: types.Message, state: FSMContext):
+async def unknown_command(msg: types.Message):
     sent_msg = await msg.answer("Извините, я не понял. Удалил ваше сообщение.")
     save_message(chat_id=msg.chat.id,
                  message_id=sent_msg.message_id,
