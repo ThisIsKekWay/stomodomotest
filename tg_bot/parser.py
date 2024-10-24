@@ -26,12 +26,12 @@ def get_horo():
         text = re.sub(r'<a(.*?)</a>', '', str(text))
         text = remove_tags(text)
         sub_res[0] = text + "\n Источник: mail.ru"
-        res[SIGNS_EN_RU[k]] = sub_res
+        res[SIGNS_EN_RU[k].lower()] = sub_res
 
     for k in SIGNS_RU_EN.keys():
-        data = (bs(requests.get("https://74.ru/horoscope/daily/").text, 'html.parser').find('h3', text=v).findNext(
+        data = (bs(requests.get("https://74.ru/horoscope/daily/").text, 'html.parser').find('h3', text=k).findNext(
             'div').text + "\n Источник: 74.ru")
-        res[k][1] = data
+        res[k.lower()][1] = data
     return res
 
 

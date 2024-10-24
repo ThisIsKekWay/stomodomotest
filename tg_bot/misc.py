@@ -33,3 +33,9 @@ ZODIAC_SIGNS = [
     "♌️ Лев", "♍️ Дева", "♎️ Весы", "♏️ Скорпион",
     "♐️ Стрелец", "♑️ Козерог", "♒️ Водолей", "♓️ Рыбы"
 ]
+
+DATE_FORMAT = "%d.%m.%Y"
+
+
+def format_date(date):
+    return date.strftime(DATE_FORMAT)

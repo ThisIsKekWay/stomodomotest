@@ -17,6 +17,9 @@ def init_db():
     CREATE TABLE IF NOT EXISTS messages (
         message_id INTEGER PRIMARY KEY,
         chat_id INTEGER,
+        type TEXT,
+        date TEXT,
+        cursor INTEGER,
         FOREIGN KEY (chat_id) REFERENCES chats (chat_id)
     )
     ''')
